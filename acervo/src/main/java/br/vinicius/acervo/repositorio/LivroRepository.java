@@ -1,6 +1,6 @@
 package br.vinicius.acervo.repositorio;
 
-import br.vinicius.acervo.modelo.Livro;
+import br.vinicius.acervo.dominio.Livro;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
