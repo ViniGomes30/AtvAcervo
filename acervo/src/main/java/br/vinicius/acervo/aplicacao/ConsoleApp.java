@@ -1,142 +1,115 @@
 package br.vinicius.acervo.aplicacao;
+import br.vinicius.acervo.entidade.Livro;
+import org.springframework.beans.factory.annotation.Autowired;
+import br.vinicius.acervo.repositorio.LivroRepository;
 import org.springframework.stereotype.Component;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Scanner;
-import br.vinicius.acervo.dominio.Livro;
 
+@Component
 public class ConsoleApp {
-    private List<Livro> livros = new ArrayList<>();
+
+    @Autowired
+    private LivroRepository livroRepository;
+
+    private Scanner scanner = new Scanner(System.in);
 
     public void iniciar() {
-        System.out.println("Aplicação console iniciada!");
-        Scanner scanner = new Scanner(System.in);
-        boolean running = true;
-
-        while (running) {
-            System.out.println("Menu:");
-            System.out.println("1. Cadastrar livro");
-            System.out.println("2. Listar livros");
-            System.out.println("3. Buscar por autor");
-            System.out.println("4. Buscar por ano");
-            System.out.println("5. Buscar por título");
-            System.out.println("6. Sair");
-            System.out.print("Escolha uma opção: ");
+        while (true) {
+            exibirMenu();
             int opcao = scanner.nextInt();
-            scanner.nextLine();
+            scanner.nextLine(); // Consumir a nova linha
 
             switch (opcao) {
                 case 1:
-                    cadastrarLivro(scanner);
+                    cadastrarLivro();
                     break;
                 case 2:
                     listarLivros();
                     break;
                 case 3:
-                    buscarPorAutor(scanner);
+                    buscarPorAutor();
                     break;
                 case 4:
-                    buscarPorAno(scanner);
+                    buscarPorAno();
                     break;
                 case 5:
-                    buscarPorTitulo(scanner);
+                    buscarPorTermoTitulo();
                     break;
-                case 6:
-                    running = false;
-                    break;
+                case 0:
+                    System.out.println("Encerrando a aplicação...");
+                    return;
                 default:
-                    System.out.println("Opção inválida. Tente novamente.");
+                    System.out.println("Opção inválida!");
             }
         }
-        scanner.close();
     }
 
-    private void cadastrarLivro(Scanner scanner) {
-        System.out.print("Digite o título do livro: ");
-        String titulo = scanner.nextLine();
-        System.out.print("Digite o autor do livro: ");
-        String autor = scanner.nextLine();
-        System.out.print("Digite o ano de publicação do livro: ");
-        int ano = scanner.nextInt();
-        scanner.nextLine();
+    private void exibirMenu() {
+        System.out.println("\n--- Menu ---");
+        System.out.println("1. Cadastrar Livro");
+        System.out.println("2. Listar Livros");
+        System.out.println("3. Buscar por Autor");
+        System.out.println("4. Buscar por Ano");
+        System.out.println("5. Buscar por Termo no Título");
+        System.out.println("0. Sair");
+        System.out.print("Escolha uma opção: ");
+    }
 
-        Livro livro = new Livro(titulo, autor, ano);
-        livros.add(livro);
+    private void cadastrarLivro() {
+        System.out.println("[Cadastro de Livro]");
+        System.out.print("Digite o título: ");
+        String titulo = scanner.nextLine();
+        System.out.print("Digite o autor: ");
+        String autor = scanner.nextLine();
+        System.out.print("Digite o ano de publicação: ");
+        int ano = scanner.nextInt();
+        scanner.nextLine(); 
+        System.out.print("Digite a editora: ");
+        String editora = scanner.nextLine();
+        if (livroRepository.existsByTituloAndAutor(titulo, autor)){
+            System.out.println("Já existe um livro cadastrado com esse título e autor.");
+        }else {
+        Livro livro = new Livro(titulo, autor, ano, editora);
+        livroRepository.save(livro);
         System.out.println("Livro cadastrado com sucesso!");
+        }
+
     }
 
     private void listarLivros() {
-        if (livros.isEmpty()) {
-            System.out.println("Nenhum livro cadastrado.");
-        } else {
-            System.out.println("Lista de livros:");
-            for (Livro livro : livros) {
-                System.out.println(livro);
-            }
-        }
-    }
-
-    private void buscarPorAutor(Scanner scanner) {
-        System.out.print("Digite o autor: ");
-        String autor = scanner.nextLine();
-        List<Livro> resultados = new ArrayList<>();
-
+        System.out.println("[Listagem Completa do Acervo]");
+        System.out.println("ID | Título | Autor | Ano | Editora");
+        System.out.println("-------------------------------------------------------------------");
+        List<Livro> livros = livroRepository.findAll();
         for (Livro livro : livros) {
-            if (livro.getAutor().equalsIgnoreCase(autor)) {
-                resultados.add(livro);
-            }
-        }
-
-        if (resultados.isEmpty()) {
-            System.out.println("Nenhum livro encontrado para o autor: " + autor);
-        } else {
-            System.out.println("Livros encontrados:");
-            for (Livro livro : resultados) {
-                System.out.println(livro);
-            }
+            System.out.println(livro.getId() + " | " + livro.getTitulo() + " | " + livro.getAutor() + " | " + livro.getAnoPublicacao() + " | " + livro.getEditora());
         }
     }
 
-    private void buscarPorAno(Scanner scanner) {
-        System.out.print("Digite o ano: ");
+    private void buscarPorAutor() {
+        System.out.print("[Busca por Autor]\nDigite o nome do autor: ");
+        String autor = scanner.nextLine();
+        List<Livro> livros = livroRepository.findByAutor(autor);
+        System.out.println("Livros encontrados:");
+        livros.forEach(System.out::println);
+    }
+
+    private void buscarPorAno() {
+        System.out.print("[Busca por Ano de Publicação]\nDigite o ano desejado: ");
         int ano = scanner.nextInt();
         scanner.nextLine();
-        List<Livro> resultados = new ArrayList<>();
-
-        for (Livro livro : livros) {
-            if (livro.getAno() == ano) {
-                resultados.add(livro);
-            }
-        }
-
-        if (resultados.isEmpty()) {
-            System.out.println("Nenhum livro encontrado para o ano: " + ano);
-        } else {
-            System.out.println("Livros encontrados:");
-            for (Livro livro : resultados) {
-                System.out.println(livro);
-            }
-        }
+        List<Livro> livros = livroRepository.findByAnoPublicacao(ano);
+        System.out.println("Livros publicados em " + ano + ":");
+        livros.forEach(System.out::println);
     }
 
-    private void buscarPorTitulo(Scanner scanner) {
-        System.out.print("Digite o título: ");
-        String titulo = scanner.nextLine();
-        List<Livro> resultados = new ArrayList<>();
-
-        for (Livro livro : livros) {
-            if (livro.getTitulo().equalsIgnoreCase(titulo)) {
-                resultados.add(livro);
-            }
-        }
-
-        if (resultados.isEmpty()) {
-            System.out.println("Nenhum livro encontrado para o título: " + titulo);
-        } else {
+    private void buscarPorTermoTitulo() {
+        System.out.print("[Busca por Termo no Título]\nDigite o termo desejado: ");
+        String termo = scanner.nextLine();
+        List<Livro> livros = livroRepository.findByTituloContainingIgnoreCase(termo);
             System.out.println("Livros encontrados:");
-            for (Livro livro : resultados) {
-                System.out.println(livro);
-            }
+            livros.forEach(System.out::println);
         }
     }
-}
