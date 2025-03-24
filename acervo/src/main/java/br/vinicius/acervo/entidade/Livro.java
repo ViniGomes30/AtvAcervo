@@ -17,7 +17,6 @@ public class Livro {
     private int anoPublicacao;
     private String editora;
 
-    // Getters e Setters
     public Long getId() {
         return id;
     }
