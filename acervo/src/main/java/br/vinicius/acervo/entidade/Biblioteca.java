@@ -16,8 +16,6 @@ public class Biblioteca {
     @OneToMany
     private List<Livro> livros = new ArrayList<>();
 
-    // Construtores, getters e setters
-
     public Biblioteca() {
     }
 
