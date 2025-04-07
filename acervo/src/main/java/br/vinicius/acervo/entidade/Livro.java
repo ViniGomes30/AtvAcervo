@@ -17,8 +17,6 @@ public class Livro {
     private int anoPublicacao;
     private String editora;
 
-    // Construtores, getters e setters
-
     public Livro() {
     }
 

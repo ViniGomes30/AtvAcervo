@@ -1,15 +1,16 @@
 package br.vinicius.acervo.aplicacao;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Scanner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import br.vinicius.acervo.entidade.Biblioteca;
 import br.vinicius.acervo.entidade.Livro;
 import br.vinicius.acervo.repositorio.BibliotecaRepository;
 import br.vinicius.acervo.repositorio.LivroRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
 
 @Component
 public class ConsoleApp {
@@ -163,6 +164,10 @@ public class ConsoleApp {
 
         if (bibliotecaOpt.isPresent()) {
             Biblioteca biblioteca = bibliotecaOpt.get();
+
+            // Initialize the livros collection
+            biblioteca.getLivros().size(); // Forces initialization of the collection
+
             System.out.print("Digite o ID do livro: ");
             Long livroId = scanner.nextLong();
             scanner.nextLine();
